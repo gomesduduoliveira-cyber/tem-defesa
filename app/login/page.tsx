@@ -1,6 +1,6 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
@@ -48,6 +48,14 @@ export default function Login() {
     const [codigoPostal, setCodigoPostal] = useState('');
     const [localidade, setLocalidade] = useState('');
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('erro') === 'confirmacao') {
+            setIsError(true);
+            setMessage('O link de confirmação expirou ou é inválido. Tente registar-se novamente.');
+        }
+    }, []);
+
     const handleNIF = (v: string) => { setNif(v.replace(/\D/g, '').slice(0, 9)); setNifErro(''); };
     const handleNIFBlur = () => {
         if (!nif) return;
@@ -72,7 +80,7 @@ export default function Login() {
                 const { error } = await supabase.auth.signUp({
                     email, password,
                     options: {
-                        emailRedirectTo: `${window.location.origin}/dashboard`,
+                        emailRedirectTo: `${window.location.origin}/auth/callback`,
                         data: { tipo_pessoa: tipoPessoa, nome, nif, carta_conducao: cartaConducao, telemovel, morada: moradaCompleta }
                     }
                 });
@@ -89,7 +97,7 @@ export default function Login() {
         e.preventDefault();
         setLoading(true); setMessage(''); setIsError(false);
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, { redirectTo: `${window.location.origin}/auth/reset-password` });
+            const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, { redirectTo: `${window.location.origin}/auth/callback` });
             if (error) throw error;
             setMessage('Link de recuperação enviado! Verifique a sua caixa de entrada.');
             setRecoveryEmail('');
