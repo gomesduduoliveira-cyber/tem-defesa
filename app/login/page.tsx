@@ -68,7 +68,21 @@ export default function Login() {
         try {
             if (isLogin) {
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
+                if (error) {
+                    if (error.message.includes('Email not confirmed')) {
+                        // Reenviar email de confirmação automaticamente
+                        await supabase.auth.resend({
+                            type: 'signup',
+                            email,
+                            options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+                        });
+                        setIsError(true);
+                        setMessage('O link de confirmação expirou. Enviámos um novo e-mail de ativação para ' + email + '. Verifique a sua caixa de entrada.');
+                        setLoading(false);
+                        return;
+                    }
+                    throw error;
+                }
                 window.location.href = '/dashboard';
             } else {
                 if (email !== confirmEmail) { setIsError(true); setMessage('Os endereços de e-mail não coincidem.'); setLoading(false); return; }
@@ -89,7 +103,10 @@ export default function Login() {
             }
         } catch (err: any) {
             setIsError(true);
-            setMessage(err.message?.includes('already registered') ? 'Este e-mail já se encontra registado.' : (err.message || 'Ocorreu um erro.'));
+            const msg = err.message || '';
+            if (msg.includes('already registered')) setMessage('Este e-mail já se encontra registado.');
+            else if (msg.includes('Invalid login credentials')) setMessage('E-mail ou palavra-passe incorretos.');
+            else setMessage(msg || 'Ocorreu um erro. Tente novamente.');
         } finally { setLoading(false); }
     };
 
