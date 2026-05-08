@@ -315,9 +315,9 @@ export default function Login() {
 
                     <p style={{ textAlign: 'center', fontSize: 12, color: '#8892aa', marginTop: 16 }}>
                         Ao aceder, aceita os nossos{' '}
-                        <Link href="/termos" style={{ color: '#c9973e' }}>Termos de Utilização</Link>
+                        <a href="/termos-de-utilizacao.pdf" target="_blank" rel="noopener noreferrer" style={{ color: '#c9973e' }}>Termos de Utilização</a>
                         {' '}e{' '}
-                        <Link href="/privacidade" style={{ color: '#c9973e' }}>Política de Privacidade</Link>
+                        <a href="/politica-de-privacidade.pdf" target="_blank" rel="noopener noreferrer" style={{ color: '#c9973e' }}>Política de Privacidade</a>
                     </p>
                 </div>
             </div>

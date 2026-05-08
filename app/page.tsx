@@ -145,8 +145,8 @@ export default function Home() {
             <footer style={{ borderTop: '1px solid #1e2540', padding: '24px', textAlign: 'center' }}>
                 <div style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
                     <Link href="/como-recorrer" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Como Recorrer</Link>
-                    <Link href="/termos" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Termos de Utilização</Link>
-                    <Link href="/privacidade" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Política de Privacidade</Link>
+                    <a href="/termos-de-utilizacao.pdf" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Termos de Utilização</a>
+                    <a href="/politica-de-privacidade.pdf" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Política de Privacidade</a>
                     <Link href="/login" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Entrar</Link>
                 </div>
                 <p style={{ fontSize: 12, color: '#4a5060', margin: 0 }}>
