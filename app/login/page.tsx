@@ -32,6 +32,8 @@ export default function Login() {
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
 
+    const [aceitouTermos, setAceitouTermos] = useState(false);
+
     const [email, setEmail] = useState('');
     const [confirmEmail, setConfirmEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -88,6 +90,7 @@ export default function Login() {
                 if (email !== confirmEmail) { setIsError(true); setMessage('Os endereços de e-mail não coincidem.'); setLoading(false); return; }
                 if (password !== confirmPassword) { setIsError(true); setMessage('As palavras-passe não coincidem.'); setLoading(false); return; }
                 if (nif && !validarNIF(nif)) { setIsError(true); setMessage('NIF inválido.'); setLoading(false); return; }
+                if (!aceitouTermos) { setIsError(true); setMessage('Deve aceitar os Termos de Utilização e a Política de Privacidade para criar uma conta.'); setLoading(false); return; }
 
                 const moradaCompleta = [morada, codigoPostal ? `CP ${codigoPostal}` : '', localidade].filter(Boolean).join(', ');
 
@@ -269,7 +272,31 @@ export default function Login() {
                                     </div>
                                 )}
 
-                                <button type="submit" disabled={loading} style={{ width: '100%', marginTop: 20, padding: 13, borderRadius: 10, background: '#c9973e', color: '#0b0e18', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', opacity: loading ? .7 : 1 }}>
+                                {/* Checkbox Termos — só no registo */}
+                                {!isLogin && (
+                                    <div style={{ marginTop: 18, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                                        <input
+                                            type="checkbox"
+                                            id="aceitarTermos"
+                                            checked={aceitouTermos}
+                                            onChange={e => setAceitouTermos(e.target.checked)}
+                                            style={{ marginTop: 2, width: 16, height: 16, accentColor: '#c9973e', cursor: 'pointer', flexShrink: 0 }}
+                                        />
+                                        <label htmlFor="aceitarTermos" style={{ fontSize: 12, color: '#8892aa', lineHeight: 1.6, cursor: 'pointer' }}>
+                                            Li e aceito os{' '}
+                                            <a href="/termos-de-utilizacao.pdf" target="_blank" rel="noopener noreferrer" style={{ color: '#c9973e', fontWeight: 600, textDecoration: 'underline' }}>
+                                                Termos de Utilização
+                                            </a>
+                                            {' '}e a{' '}
+                                            <a href="/politica-de-privacidade.pdf" target="_blank" rel="noopener noreferrer" style={{ color: '#c9973e', fontWeight: 600, textDecoration: 'underline' }}>
+                                                Política de Privacidade
+                                            </a>
+                                            {' '}da TEM Defesa, incluindo o tratamento dos meus dados pessoais nos termos do RGPD.
+                                        </label>
+                                    </div>
+                                )}
+
+                                <button type="submit" disabled={loading} style={{ width: '100%', marginTop: 16, padding: 13, borderRadius: 10, background: !isLogin && !aceitouTermos ? '#555' : '#c9973e', color: '#0b0e18', fontWeight: 700, fontSize: 15, border: 'none', cursor: !isLogin && !aceitouTermos ? 'not-allowed' : 'pointer', opacity: loading ? .7 : 1 }}>
                                     {loading ? 'A aguardar...' : isLogin ? 'Entrar' : 'Finalizar registo'}
                                 </button>
                             </form>
