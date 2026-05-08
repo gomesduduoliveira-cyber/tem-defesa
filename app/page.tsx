@@ -31,6 +31,7 @@ export default function Home() {
                     </div>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                         <Link href="/como-recorrer" style={{ padding: '8px 16px', borderRadius: 8, fontSize: 14, color: '#8892aa', textDecoration: 'none' }}>Como Recorrer</Link>
+                        <Link href="/planos" style={{ padding: '8px 16px', borderRadius: 8, fontSize: 14, color: '#8892aa', textDecoration: 'none' }}>Preços</Link>
                         <Link href="/login" style={{ padding: '8px 16px', borderRadius: 8, fontSize: 14, color: '#8892aa', textDecoration: 'none' }}>Entrar</Link>
                         <Link href="/login" style={{ padding: '9px 20px', borderRadius: 8, fontSize: 14, fontWeight: 600, background: '#c9973e', color: '#0b0e18', textDecoration: 'none' }}>Começar grátis</Link>
                     </div>
@@ -132,6 +133,101 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* ── PREÇOS ── */}
+            <section style={{ background: '#0e1220', borderTop: '1px solid #1e2540', borderBottom: '1px solid #1e2540', padding: '70px 24px' }} id="precos">
+                <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
+                    <div style={{ display: 'inline-block', padding: '5px 14px', borderRadius: 20, background: 'rgba(201,151,62,.1)', border: '1px solid rgba(201,151,62,.2)', fontSize: 12, color: '#c9973e', fontWeight: 700, marginBottom: 16, textTransform: 'uppercase' as const, letterSpacing: '.08em' }}>
+                        Preços
+                    </div>
+                    <h2 style={{ fontSize: '1.9rem', fontWeight: 700, marginBottom: 12 }}>Simples e transparente</h2>
+                    <p style={{ color: '#8892aa', fontSize: 15, marginBottom: 48, maxWidth: 500, margin: '0 auto 48px' }}>
+                        Paga apenas o que usa. Sem subscrições obrigatórias, sem surpresas.
+                    </p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 16, alignItems: 'start' }}>
+
+                        {/* 1 crédito */}
+                        <div style={{ background: '#111526', border: '1px solid #1e2540', borderRadius: 16, padding: '28px 22px', textAlign: 'center' }}>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#8892aa', textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>1 Defesa</p>
+                            <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#f0ebe0', margin: '0 0 4px', lineHeight: 1 }}>€9<span style={{ fontSize: '1.2rem' }}>,90</span></p>
+                            <p style={{ fontSize: 12, color: '#8892aa', margin: '0 0 24px' }}>por defesa gerada</p>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', textAlign: 'left', display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
+                                {['1 crédito de defesa', 'Download .doc', 'Fundamentação RGCO', 'Válido 12 meses'].map(f => (
+                                    <li key={f} style={{ fontSize: 13, color: '#8892aa', display: 'flex', gap: 8, alignItems: 'center' }}>
+                                        <span style={{ color: '#4aaa6a', fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                                    </li>
+                                ))}
+                            </ul>
+                            <Link href="/login" style={{ display: 'block', padding: '11px', borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: '#f0ebe0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' as const }}>
+                                Começar
+                            </Link>
+                        </div>
+
+                        {/* Pack 3 — POPULAR */}
+                        <div style={{ background: '#111526', border: '2px solid #c9973e', borderRadius: 16, padding: '28px 22px', textAlign: 'center', position: 'relative' as const }}>
+                            <div style={{ position: 'absolute' as const, top: -12, left: '50%', transform: 'translateX(-50%)', background: '#c9973e', color: '#0b0e18', fontSize: 11, fontWeight: 700, padding: '3px 14px', borderRadius: 20, whiteSpace: 'nowrap' as const }}>
+                                MAIS POPULAR
+                            </div>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#c9973e', textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>Pack 3 Defesas</p>
+                            <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#f0ebe0', margin: '0 0 4px', lineHeight: 1 }}>€24<span style={{ fontSize: '1.2rem' }}>,90</span></p>
+                            <p style={{ fontSize: 12, color: '#8892aa', margin: '0 0 24px' }}>€8,30 por defesa · poupa 16%</p>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', textAlign: 'left', display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
+                                {['3 créditos de defesa', 'Download .doc', 'Fundamentação RGCO', 'Válido 12 meses', 'Poupança de 16%'].map(f => (
+                                    <li key={f} style={{ fontSize: 13, color: '#8892aa', display: 'flex', gap: 8, alignItems: 'center' }}>
+                                        <span style={{ color: '#4aaa6a', fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                                    </li>
+                                ))}
+                            </ul>
+                            <Link href="/login" style={{ display: 'block', padding: '11px', borderRadius: 9, background: '#c9973e', color: '#0b0e18', fontWeight: 700, fontSize: 14, textDecoration: 'none', textAlign: 'center' as const }}>
+                                Escolher Pack 3
+                            </Link>
+                        </div>
+
+                        {/* Pack 10 */}
+                        <div style={{ background: '#111526', border: '1px solid #1e2540', borderRadius: 16, padding: '28px 22px', textAlign: 'center' }}>
+                            <div style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 10, background: 'rgba(74,170,106,.12)', border: '1px solid rgba(74,170,106,.25)', fontSize: 11, fontWeight: 700, color: '#4aaa6a', marginBottom: 12 }}>
+                                MELHOR VALOR
+                            </div>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#8892aa', textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>Pack 10 Defesas</p>
+                            <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#f0ebe0', margin: '0 0 4px', lineHeight: 1 }}>€69<span style={{ fontSize: '1.2rem' }}>,90</span></p>
+                            <p style={{ fontSize: 12, color: '#8892aa', margin: '0 0 24px' }}>€6,99 por defesa · poupa 29%</p>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', textAlign: 'left', display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
+                                {['10 créditos de defesa', 'Download .doc', 'Fundamentação RGCO', 'Válido 24 meses', 'Ideal para frotas', 'Poupança de 29%'].map(f => (
+                                    <li key={f} style={{ fontSize: 13, color: '#8892aa', display: 'flex', gap: 8, alignItems: 'center' }}>
+                                        <span style={{ color: '#4aaa6a', fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                                    </li>
+                                ))}
+                            </ul>
+                            <Link href="/login" style={{ display: 'block', padding: '11px', borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: '#f0ebe0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' as const }}>
+                                Escolher Pack 10
+                            </Link>
+                        </div>
+
+                        {/* Subscrição */}
+                        <div style={{ background: '#111526', border: '1px solid #1e2540', borderRadius: 16, padding: '28px 22px', textAlign: 'center' }}>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#8892aa', textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>Subscrição Mensal</p>
+                            <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#f0ebe0', margin: '0 0 4px', lineHeight: 1 }}>€19<span style={{ fontSize: '1.2rem' }}>,90</span></p>
+                            <p style={{ fontSize: 12, color: '#8892aa', margin: '0 0 24px' }}>por mês · 5 defesas/mês</p>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', textAlign: 'left', display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
+                                {['5 defesas por mês', 'Renovação automática', 'Download .doc', 'Fundamentação RGCO', 'Ideal para condutores profissionais'].map(f => (
+                                    <li key={f} style={{ fontSize: 13, color: '#8892aa', display: 'flex', gap: 8, alignItems: 'center' }}>
+                                        <span style={{ color: '#4aaa6a', fontWeight: 700, flexShrink: 0 }}>✓</span>{f}
+                                    </li>
+                                ))}
+                            </ul>
+                            <Link href="/login" style={{ display: 'block', padding: '11px', borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: '#f0ebe0', fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' as const }}>
+                                Subscrever
+                            </Link>
+                        </div>
+
+                    </div>
+
+                    <p style={{ fontSize: 13, color: '#4a5060', marginTop: 28 }}>
+                        💳 Pagamento seguro via Stripe · MB Way em breve · Créditos não expiram (exceto subscrição)
+                    </p>
+                </div>
+            </section>
+
             {/* ── CTA ── */}
             <section style={{ background: 'linear-gradient(135deg, rgba(201,151,62,.12) 0%, rgba(11,14,24,0) 100%)', borderTop: '1px solid rgba(201,151,62,.2)', padding: '60px 24px', textAlign: 'center' }}>
                 <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: 12 }}>Pronto para contestar a sua coima?</h2>
@@ -145,6 +241,7 @@ export default function Home() {
             <footer style={{ borderTop: '1px solid #1e2540', padding: '24px', textAlign: 'center' }}>
                 <div style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
                     <Link href="/como-recorrer" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Como Recorrer</Link>
+                    <Link href="/planos" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Preços</Link>
                     <a href="/termos-de-utilizacao.pdf" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Termos de Utilização</a>
                     <a href="/politica-de-privacidade.pdf" target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Política de Privacidade</a>
                     <Link href="/login" style={{ fontSize: 13, color: '#8892aa', textDecoration: 'none' }}>Entrar</Link>

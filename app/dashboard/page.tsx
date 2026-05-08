@@ -7,6 +7,8 @@ import Link from 'next/link';
 const IS = { width: '100%', padding: '10px 13px', borderRadius: 8, background: '#0d1020', border: '1px solid #2a304a', color: '#f0ebe0', boxSizing: 'border-box' as const, fontSize: 13, fontFamily: 'inherit', outline: 'none' };
 const LS = { display: 'block', fontSize: 11, fontWeight: 600, color: '#8892aa', textTransform: 'uppercase' as const, letterSpacing: '.05em', margin: '0 0 5px' };
 
+const ADMIN_EMAIL = 'gomesduduoliveira@gmail.com';
+
 type Passo = 'upload' | 'confirmar' | 'relato' | 'gerar' | 'concluido';
 
 export default function Dashboard() {
@@ -28,6 +30,9 @@ export default function Dashboard() {
     const [erro, setErro] = useState('');
     const [defesas, setDefesas] = useState<any[]>([]);
     const fileRef = useRef<HTMLInputElement>(null);
+
+    // Créditos
+    const [uploadCreditoUsado, setUploadCreditoUsado] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -56,6 +61,13 @@ export default function Dashboard() {
 
     const extrairDados = async () => {
         if (!ficheiro) return;
+        const isAdmin = user?.email === ADMIN_EMAIL;
+        const assinante = perfil?.is_assinante;
+        const creditos = perfil?.creditos || 0;
+        if (!isAdmin && !assinante && creditos <= 0) {
+            setErro('Sem créditos disponíveis. Adquira um plano para continuar.');
+            return;
+        }
         setUploadLoading(true); setErro('');
         try {
             const reader = new FileReader();
@@ -72,6 +84,12 @@ export default function Dashboard() {
             const { dados, error } = await r.json();
             if (error) throw new Error(error);
             setDadosAuto(dados || {});
+            // Debitar 1 crédito pelo upload com IA
+            if (!isAdmin && !assinante) {
+                await supabase.from('profiles').update({ creditos: creditos - 1 }).eq('id', user.id);
+                setPerfil((p: any) => ({ ...p, creditos: creditos - 1 }));
+                setUploadCreditoUsado(true);
+            }
             setPasso('confirmar');
         } catch (e: any) {
             setErro('Não foi possível extrair os dados. Preencha manualmente.');
@@ -82,6 +100,13 @@ export default function Dashboard() {
     };
 
     const gerarDefesa = async () => {
+        const isAdmin = user?.email === ADMIN_EMAIL;
+        const assinante = perfil?.is_assinante;
+        const creditos = perfil?.creditos || 0;
+        if (!isAdmin && !assinante && !uploadCreditoUsado && creditos <= 0) {
+            setErro('Sem créditos disponíveis. Adquira um plano para continuar.');
+            return;
+        }
         setGerandoDefesa(true); setErro('');
         try {
             const r = await fetch('/api/gerar-defesa', {
@@ -93,6 +118,11 @@ export default function Dashboard() {
             if (error) throw new Error(error);
             setDefesaGerada(defesa);
             setPasso('concluido');
+            // Debitar 1 crédito na geração, se o upload não debitou
+            if (!isAdmin && !assinante && !uploadCreditoUsado) {
+                await supabase.from('profiles').update({ creditos: creditos - 1 }).eq('id', user.id);
+                setPerfil((p: any) => ({ ...p, creditos: creditos - 1 }));
+            }
             const { data: hist } = await supabase.from('defesas').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20);
             setDefesas(hist || []);
         } catch (e: any) {
@@ -114,6 +144,7 @@ export default function Dashboard() {
     const reiniciar = () => {
         setPasso('upload'); setFicheiro(null); setPreview('');
         setDadosAuto({}); setRelato(''); setDefesaGerada(''); setErro('');
+        setUploadCreditoUsado(false);
     };
 
     if (loading) return (
@@ -134,6 +165,17 @@ export default function Dashboard() {
                     </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    {user?.email !== ADMIN_EMAIL && !perfil?.is_assinante && (
+                        <Link href="/planos" style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', borderRadius: 8, background: (perfil?.creditos || 0) <= 0 ? 'rgba(224,80,80,.12)' : 'rgba(201,151,62,.1)', border: `1px solid ${(perfil?.creditos || 0) <= 0 ? 'rgba(224,80,80,.3)' : 'rgba(201,151,62,.25)'}`, fontSize: 12, fontWeight: 700, color: (perfil?.creditos || 0) <= 0 ? '#e05050' : '#c9973e', textDecoration: 'none' }}>
+                            🪙 {perfil?.creditos || 0} crédito{(perfil?.creditos || 0) !== 1 ? 's' : ''}
+                        </Link>
+                    )}
+                    {perfil?.is_assinante && (
+                        <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 8, background: 'rgba(201,151,62,.1)', color: '#c9973e', fontWeight: 700 }}>👑 Assinante</span>
+                    )}
+                    {user?.email === ADMIN_EMAIL && (
+                        <span style={{ fontSize: 12, padding: '5px 12px', borderRadius: 8, background: 'rgba(90,170,240,.1)', color: '#5aaaf0', fontWeight: 700 }}>👨‍💻 Admin</span>
+                    )}
                     <span style={{ fontSize: 13, color: '#8892aa' }}>{perfil?.nome?.split(' ')[0] || user?.email}</span>
                     <button onClick={async () => { await supabase.auth.signOut(); window.location.href = '/'; }}
                         style={{ padding: '6px 14px', borderRadius: 8, fontSize: 13, background: 'transparent', border: '1px solid #2a304a', color: '#8892aa', cursor: 'pointer' }}>
@@ -157,6 +199,9 @@ export default function Dashboard() {
                             </button>
                         ))}
                         <div style={{ margin: '12px 16px', height: 1, background: '#1e2540' }} />
+                        <Link href="/planos" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 20px', color: '#c9973e', fontSize: 13, textDecoration: 'none', fontWeight: 600 }}>
+                            💳 Comprar Créditos
+                        </Link>
                         <Link href="/como-recorrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 20px', color: '#8892aa', fontSize: 13, textDecoration: 'none' }}>
                             ⚖️ Como Recorrer
                         </Link>
@@ -243,10 +288,22 @@ export default function Dashboard() {
                                 <img src={preview} alt="Pré-visualização" style={{ maxWidth: '100%', maxHeight: 300, borderRadius: 8, marginTop: 16, objectFit: 'contain', border: '1px solid #2a304a' }} />
                             )}
 
-                            <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
+                            {/* Aviso de crédito */}
+                            {user?.email !== ADMIN_EMAIL && !perfil?.is_assinante && (
+                                <div style={{ marginTop: 16, background: 'rgba(201,151,62,.06)', border: '1px solid rgba(201,151,62,.2)', borderRadius: 10, padding: '11px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' as const, gap: 8 }}>
+                                    <p style={{ fontSize: 13, color: '#8892aa', margin: 0 }}>
+                                        🤖 Extrair com IA desconta <strong style={{ color: '#f0ebe0' }}>1 crédito</strong> · Gerar depois é gratuito · Saldo: <strong style={{ color: (perfil?.creditos || 0) > 0 ? '#c9973e' : '#e05050' }}>{perfil?.creditos || 0}</strong>
+                                    </p>
+                                    {(perfil?.creditos || 0) <= 0 && (
+                                        <Link href="/planos" style={{ fontSize: 12, fontWeight: 700, color: '#c9973e', textDecoration: 'none', whiteSpace: 'nowrap' as const }}>Comprar créditos →</Link>
+                                    )}
+                                </div>
+                            )}
+
+                            <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
                                 <button onClick={extrairDados} disabled={!ficheiro || uploadLoading}
                                     style={{ flex: 1, minWidth: 160, padding: '12px 20px', borderRadius: 10, background: '#c9973e', color: '#0b0e18', fontWeight: 700, fontSize: 14, border: 'none', cursor: ficheiro && !uploadLoading ? 'pointer' : 'not-allowed', opacity: !ficheiro || uploadLoading ? .6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                                    {uploadLoading ? <><span className="spinner" style={{ borderTopColor: '#0b0e18', borderColor: 'rgba(0,0,0,.2)' }} /> A extrair dados...</> : '🤖 Extrair dados com IA'}
+                                    {uploadLoading ? <><span className="spinner" style={{ borderTopColor: '#0b0e18', borderColor: 'rgba(0,0,0,.2)' }} /> A extrair dados...</> : '🤖 Extrair dados com IA — 1 crédito'}
                                 </button>
                                 <button onClick={() => { setDadosAuto({}); setPasso('confirmar'); }}
                                     style={{ padding: '12px 20px', borderRadius: 10, background: 'transparent', border: '1px solid #2a304a', color: '#8892aa', fontSize: 14, cursor: 'pointer' }}>
@@ -327,7 +384,24 @@ export default function Dashboard() {
                                 </ul>
                             </div>
 
-                            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+                            {/* Info crédito */}
+                            {uploadCreditoUsado ? (
+                                <div style={{ background: '#0a2a1a', border: '1px solid rgba(74,170,106,.3)', borderRadius: 10, padding: '11px 16px', marginTop: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <span style={{ fontSize: 16 }}>✅</span>
+                                    <p style={{ fontSize: 13, color: '#4aaa6a', margin: 0 }}>Crédito utilizado no upload. <strong>Gerar a defesa é gratuito!</strong></p>
+                                </div>
+                            ) : (
+                                <div style={{ background: '#0d1020', border: '1px solid #2a304a', borderRadius: 10, padding: '11px 16px', marginTop: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <span style={{ fontSize: 16 }}>🪙</span>
+                                    <p style={{ fontSize: 13, margin: 0, color: '#8892aa' }}>
+                                        {user?.email === ADMIN_EMAIL || perfil?.is_assinante
+                                            ? 'Geração ilimitada para a sua conta.'
+                                            : `Ao gerar a defesa, será debitado 1 crédito. Saldo atual: ${perfil?.creditos || 0} crédito(s).`}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
                                 <button onClick={() => setPasso('confirmar')} style={{ padding: '12px 20px', borderRadius: 10, background: 'transparent', border: '1px solid #2a304a', color: '#8892aa', fontSize: 14, cursor: 'pointer' }}>← Voltar</button>
                                 <button onClick={gerarDefesa} disabled={!relato.trim() || gerandoDefesa}
                                     style={{ flex: 1, padding: '12px 20px', borderRadius: 10, background: '#c9973e', color: '#0b0e18', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', opacity: !relato.trim() || gerandoDefesa ? .5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
