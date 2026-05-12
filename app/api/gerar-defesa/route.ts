@@ -42,10 +42,22 @@ async function extrairDadosAuto(base64: string, mimeType: string) {
 // POST /api/gerar-defesa — gera o documento de defesa
 export async function POST(req: Request) {
     try {
-        const { dadosAuto, dadosArguido, relato, userId } = await req.json();
+        const body = await req.json();
+        const { dadosAuto, dadosArguido, relato, userId } = body;
+
+        const { respostas, estrategias } = body;
 
         const tipoInfracao = detetarTipoInfracaoPT(dadosAuto?.infracao || '');
         const systemPrompt = buildSystemPromptPT(tipoInfracao);
+
+        const contextoEntrevista = respostas?.length
+            ? `\n\nRESPOSTAS DO ARGUIDO À ENTREVISTA GUIADA:
+${respostas.map((r: { pergunta: string; resposta: string }) => `- Pergunta: ${r.pergunta}\n  Resposta: ${r.resposta}`).join('\n')}
+
+ESTRATÉGIAS IDENTIFICADAS PREVIAMENTE: ${estrategias?.join(', ') || 'nenhuma'}
+
+DIRETRIZ: Cada resposta pode revelar um vício formal ou falha de procedimento — explora todas. Se o arguido disse que o agente NÃO fez algo obrigatório, isso é argumento de nulidade. Se respondeu "Não sei informar", não uses esse ponto como argumento.`
+            : `\n\nRELATO DO ARGUIDO:\n"${relato || 'Sem relato fornecido'}"`;
 
         const userPrompt = `DADOS DO AUTO DE CONTRAORDENAÇÃO:
 Autoridade: ${dadosAuto?.autoridade || 'Não indicado'}
@@ -62,9 +74,7 @@ NIF: ${dadosArguido?.nif || 'Não indicado'}
 Carta de Condução: ${dadosArguido?.cartaConducao || 'Não indicada'}
 Morada: ${dadosArguido?.morada || 'Não indicada'}
 Localidade: ${dadosArguido?.localidade || 'Não indicada'}, ${dadosArguido?.codigoPostal || ''}
-
-RELATO DO ARGUIDO:
-"${relato || 'Sem relato fornecido'}"
+${contextoEntrevista}
 
 Elabora a defesa administrativa completa.`;
 

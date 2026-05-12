@@ -1,6 +1,7 @@
 'use client';
 export const dynamic = 'force-dynamic';
 import { useState, useEffect } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
@@ -46,6 +47,15 @@ export default function Login() {
     const [nifErro, setNifErro] = useState('');
     const [cartaConducao, setCartaConducao] = useState('');
     const [telemovel, setTelemovel] = useState('');
+    // Turnstile
+    const [turnstileToken, setTurnstileToken] = useState('');
+
+    // Password helpers
+    const temMinimo = password.length >= 8;
+    const temMaiuscula = /[A-Z]/.test(password);
+    const temEspecial = /[^a-zA-Z0-9\s]/.test(password);
+    const senhaValida = temMinimo && temMaiuscula && temEspecial;
+
     const [morada, setMorada] = useState('');
     const [codigoPostal, setCodigoPostal] = useState('');
     const [localidade, setLocalidade] = useState('');
@@ -58,6 +68,7 @@ export default function Login() {
         }
     }, []);
 
+
     const handleNIF = (v: string) => { setNif(v.replace(/\D/g, '').slice(0, 9)); setNifErro(''); };
     const handleNIFBlur = () => {
         if (!nif) return;
@@ -68,6 +79,24 @@ export default function Login() {
         e.preventDefault();
         setLoading(true); setMessage(''); setIsError(false);
         try {
+            // Validação da palavra-passe (somente no registo)
+            if (!isLogin && !senhaValida) {
+                setIsError(true);
+                setMessage('A palavra-passe não cumpre os requisitos: mínimo 8 caracteres, 1 letra maiúscula e 1 caractere especial.');
+                setLoading(false); return;
+            }
+            // Verificação Turnstile
+            const verifyRes = await fetch('/api/verify-turnstile', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: turnstileToken }),
+            });
+            const verifyData = await verifyRes.json();
+            if (!verifyData.success) {
+                setIsError(true);
+                setMessage('A verificação de segurança falhou. Aguarde e tente novamente.');
+                setTurnstileToken('');
+                setLoading(false); return;
+            }
             if (isLogin) {
                 const { error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) {
@@ -248,6 +277,20 @@ export default function Login() {
                                     <div>
                                         <label style={LS}>Palavra-passe *</label>
                                         <input style={IS} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+                                        {!isLogin && password && (
+                                            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                                {[
+                                                    { ok: temMinimo, label: 'Mínimo 8 caracteres' },
+                                                    { ok: temMaiuscula, label: '1 letra maiúscula (A-Z)' },
+                                                    { ok: temEspecial, label: '1 caractere especial (!@#$%...)' },
+                                                ].map(({ ok, label }) => (
+                                                    <p key={label} style={{ fontSize: 11, margin: 0, display: 'flex', gap: 5, alignItems: 'center' }}>
+                                                        <span style={{ color: ok ? '#4aaa6a' : '#e05050', fontWeight: 700 }}>{ok ? '✓' : '✗'}</span>
+                                                        <span style={{ color: ok ? '#4aaa6a' : '#8892aa' }}>{label}</span>
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                     {!isLogin && (
                                         <div>
@@ -295,6 +338,17 @@ export default function Login() {
                                         </label>
                                     </div>
                                 )}
+
+                                {/* Turnstile anti-bot */}
+                                <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
+                                    <Turnstile
+                                        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA'}
+                                        onSuccess={(token) => setTurnstileToken(token)}
+                                        onExpire={() => setTurnstileToken('')}
+                                        onError={() => setTurnstileToken('')}
+                                        options={{ theme: 'dark' }}
+                                    />
+                                </div>
 
                                 <button type="submit" disabled={loading} style={{ width: '100%', marginTop: 16, padding: 13, borderRadius: 10, background: !isLogin && !aceitouTermos ? '#555' : '#c9973e', color: '#0b0e18', fontWeight: 700, fontSize: 15, border: 'none', cursor: !isLogin && !aceitouTermos ? 'not-allowed' : 'pointer', opacity: loading ? .7 : 1 }}>
                                     {loading ? 'A aguardar...' : isLogin ? 'Entrar' : 'Finalizar registo'}
