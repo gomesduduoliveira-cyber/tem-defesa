@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { dadosAuto, dadosArguido, relato, userId } = body;
 
-        const { respostas, estrategias } = body;
+        const { respostas, estrategias, argumentosViabilidade } = body;
 
         const tipoInfracao = detetarTipoInfracaoPT(dadosAuto?.infracao || '');
         const systemPrompt = buildSystemPromptPT(tipoInfracao);
@@ -75,6 +75,9 @@ Carta de Condução: ${dadosArguido?.cartaConducao || 'Não indicada'}
 Morada: ${dadosArguido?.morada || 'Não indicada'}
 Localidade: ${dadosArguido?.localidade || 'Não indicada'}, ${dadosArguido?.codigoPostal || ''}
 ${contextoEntrevista}
+${argumentosViabilidade?.length
+    ? `\nARGUMENTOS PRÉ-IDENTIFICADOS NA ANÁLISE DE VIABILIDADE (incorpora e desenvolve estes na defesa):\n${argumentosViabilidade.map((a: any) => `- [FORÇA ${(a.forca || '').toUpperCase()}] ${a.titulo}: ${a.descricao}`).join('\n')}`
+    : ''}
 
 Elabora a defesa administrativa completa.`;
 

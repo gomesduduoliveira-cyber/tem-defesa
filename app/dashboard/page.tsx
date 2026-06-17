@@ -9,7 +9,7 @@ const LS: React.CSSProperties = { display: 'block', fontSize: 11, fontWeight: 60
 
 const ADMIN_EMAIL = 'gomesduduoliveira@gmail.com';
 
-type Passo = 'upload' | 'confirmar' | 'entrevista' | 'fora_escopo' | 'concluido';
+type Passo = 'upload' | 'confirmar' | 'viabilidade' | 'entrevista' | 'fora_escopo' | 'concluido';
 
 interface Pergunta {
     id: string;
@@ -52,6 +52,11 @@ export default function Dashboard() {
     const [defesas, setDefesas] = useState<any[]>([]);
     const [uploadCreditoUsado, setUploadCreditoUsado] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
+
+    // Viabilidade
+    const [viabilidade, setViabilidade] = useState<any>(null);
+    const [viabilidadeInterna, setViabilidadeInterna] = useState<any>(null);
+    const [analisandoViabilidade, setAnalisandoViabilidade] = useState(false);
 
     // Entrevista
     const [analise, setAnalise] = useState<Analise | null>(null);
@@ -122,6 +127,30 @@ export default function Dashboard() {
         setUploadLoading(false);
     };
 
+    const handleVerificarViabilidade = async () => {
+        const isAdmin = user?.email === ADMIN_EMAIL;
+        const assinante = perfil?.is_assinante;
+        const creditos = perfil?.creditos || 0;
+        if (!isAdmin && !assinante && !uploadCreditoUsado && creditos <= 0) { setErro('Sem créditos disponíveis. Adquira um plano para continuar.'); return; }
+        setAnalisandoViabilidade(true); setErro('');
+        try {
+            const res = await fetch('/api/relatorio-viabilidade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dadosAuto }),
+            });
+            const dados = await res.json();
+            if (dados.error) throw new Error(dados.error);
+            setViabilidade(dados.publico);
+            setViabilidadeInterna(dados.internos);
+            setPasso('viabilidade');
+        } catch {
+            setErro('Não foi possível gerar o relatório de viabilidade. Tente novamente ou avance para as perguntas.');
+        } finally {
+            setAnalisandoViabilidade(false);
+        }
+    };
+
     const handleAnalisarAuto = async () => {
         setAnalisando(true); setErro('');
         try {
@@ -176,7 +205,8 @@ export default function Dashboard() {
                     relato: '',
                     userId: user?.id,
                     respostas: respostasChat,
-                    estrategias: analise?.estrategias_possiveis
+                    estrategias: analise?.estrategias_possiveis,
+                    argumentosViabilidade: viabilidadeInterna?.argumentos
                 }),
             });
             const { defesa, error } = await r.json();
@@ -210,6 +240,7 @@ export default function Dashboard() {
         setDadosAuto({}); setDefesaGerada(''); setErro('');
         setUploadCreditoUsado(false); setAnalise(null);
         setPerguntaAtual(0); setRespostasChat([]); setRespostaInput('');
+        setViabilidade(null); setViabilidadeInterna(null);
     };
 
     if (loading) return (
@@ -291,7 +322,7 @@ export default function Dashboard() {
                     )}
 
                     {/* INDICADOR DE PASSOS */}
-                    {passo !== 'concluido' && passo !== 'fora_escopo' && (
+                    {passo !== 'concluido' && passo !== 'fora_escopo' && passo !== 'viabilidade' && (
                         <div style={{ display: 'flex', gap: 6, marginBottom: 28, alignItems: 'center' }}>
                             {passosVisiveis.map((p, i) => {
                                 const ativo = p === passo;
@@ -376,14 +407,78 @@ export default function Dashboard() {
                                     <input style={IS} value={dadosAuto.detalhes || ''} placeholder="Ex: 95 km/h em zona de 50 km/h, radar fixo" onChange={e => setDadosAuto((d: any) => ({ ...d, detalhes: e.target.value }))} />
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+                            <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
                                 <button onClick={() => setPasso('upload')} style={{ padding: '12px 20px', borderRadius: 10, background: 'transparent', border: '1px solid #2a304a', color: '#8892aa', fontSize: 14, cursor: 'pointer' }}>← Voltar</button>
-                                <button onClick={handleAnalisarAuto} disabled={!dadosAuto.autoridade || !dadosAuto.infracao || analisando} style={{ flex: 1, padding: '12px 20px', borderRadius: 10, background: '#c9973e', color: '#0b0e18', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', opacity: !dadosAuto.autoridade || !dadosAuto.infracao || analisando ? .5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                                <button onClick={handleVerificarViabilidade} disabled={!dadosAuto.autoridade || !dadosAuto.infracao || analisandoViabilidade || analisando} style={{ flex: 1, minWidth: 200, padding: '12px 20px', borderRadius: 10, background: 'rgba(201,151,62,.1)', border: '1px solid rgba(201,151,62,.4)', color: '#c9973e', fontWeight: 700, fontSize: 14, cursor: 'pointer', opacity: !dadosAuto.autoridade || !dadosAuto.infracao || analisandoViabilidade || analisando ? .5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                                    {analisandoViabilidade ? <><span className="spinner" style={{ borderTopColor: '#c9973e', borderColor: 'rgba(201,151,62,.2)' }} /> A avaliar...</> : '📊 Verificar viabilidade'}
+                                </button>
+                                <button onClick={handleAnalisarAuto} disabled={!dadosAuto.autoridade || !dadosAuto.infracao || analisando || analisandoViabilidade} style={{ flex: 1, minWidth: 200, padding: '12px 20px', borderRadius: 10, background: '#c9973e', color: '#0b0e18', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', opacity: !dadosAuto.autoridade || !dadosAuto.infracao || analisando || analisandoViabilidade ? .5 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                                    {analisando ? <><span className="spinner" style={{ borderTopColor: '#0b0e18', borderColor: 'rgba(0,0,0,.2)' }} /> A analisar...</> : 'Responder perguntas →'}
+                                </button>
+                            </div>
+                            <p style={{ fontSize: 12, color: '#8892aa', margin: '12px 0 0', textAlign: 'center' }}>
+                                💡 A verificação de viabilidade analisa as suas hipóteses de êxito antes de gerar a defesa — sem custo adicional de crédito.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* VIABILIDADE */}
+                    {passo === 'viabilidade' && viabilidade && (() => {
+                        const score = Number(viabilidade.score) || 0;
+                        const cor = score >= 60 ? '#4aaa6a' : score >= 40 ? '#c9973e' : '#e05050';
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                    <button onClick={() => setPasso('confirmar')} style={{ background: 'transparent', border: '1px solid #2a304a', color: '#8892aa', padding: '8px 14px', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>← Voltar aos dados</button>
+                                    <h2 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>📊 Relatório de Viabilidade</h2>
+                                </div>
+
+                                {/* Score + classificação */}
+                                <div style={{ background: '#111526', border: `1px solid ${cor}55`, borderRadius: 16, padding: '28px 24px', display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+                                    <div style={{ flexShrink: 0, width: 120, textAlign: 'center' }}>
+                                        <div style={{ fontSize: '3.2rem', fontWeight: 900, color: cor, lineHeight: 1 }}>{score}</div>
+                                        <div style={{ fontSize: 12, color: '#8892aa', marginTop: 4 }}>de 100</div>
+                                        <div style={{ height: 6, background: '#2a304a', borderRadius: 3, overflow: 'hidden', marginTop: 10 }}>
+                                            <div style={{ height: '100%', width: `${score}%`, background: cor, borderRadius: 3, transition: 'width .4s ease' }} />
+                                        </div>
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 220 }}>
+                                        <p style={{ fontSize: 18, fontWeight: 700, color: cor, margin: '0 0 6px' }}>{viabilidade.classificacao}</p>
+                                        <p style={{ fontSize: 14, color: '#c0cce0', margin: '0 0 10px', fontWeight: 600 }}>{viabilidade.recomendacao}</p>
+                                        <p style={{ fontSize: 13, color: '#8892aa', lineHeight: 1.65, margin: 0 }}>{viabilidade.resumo_publico}</p>
+                                    </div>
+                                </div>
+
+                                {/* Prazo + observação */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 14 }}>
+                                    {viabilidade.prazo && (
+                                        <div style={{ background: '#111526', border: '1px solid #1e2540', borderRadius: 12, padding: '16px 18px' }}>
+                                            <p style={{ fontSize: 11, color: '#c9973e', textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 700, margin: '0 0 6px' }}>⏱️ Prazo</p>
+                                            <p style={{ fontSize: 13, color: '#c0cce0', margin: 0, lineHeight: 1.5 }}>{viabilidade.prazo}</p>
+                                        </div>
+                                    )}
+                                    {viabilidade.observacao && (
+                                        <div style={{ background: '#111526', border: '1px solid #1e2540', borderRadius: 12, padding: '16px 18px' }}>
+                                            <p style={{ fontSize: 11, color: '#c9973e', textTransform: 'uppercase', letterSpacing: '.06em', fontWeight: 700, margin: '0 0 6px' }}>💡 Dica</p>
+                                            <p style={{ fontSize: 13, color: '#c0cce0', margin: 0, lineHeight: 1.5 }}>{viabilidade.observacao}</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Argumentos reservados */}
+                                <div style={{ background: 'rgba(201,151,62,.06)', border: '1px solid rgba(201,151,62,.2)', borderRadius: 12, padding: '16px 20px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                                    <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>🔒</span>
+                                    <p style={{ fontSize: 13, color: '#8892aa', margin: 0, lineHeight: 1.6 }}>
+                                        Os argumentos jurídicos específicos foram identificados e ficam <strong style={{ color: '#c9973e' }}>reservados</strong> — serão desenvolvidos na defesa completa quando responder às perguntas e gerar o documento.
+                                    </p>
+                                </div>
+
+                                <button onClick={handleAnalisarAuto} disabled={analisando} style={{ width: '100%', padding: '16px', background: '#c9973e', color: '#0b0e18', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', fontSize: '1.02rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                                     {analisando ? <><span className="spinner" style={{ borderTopColor: '#0b0e18', borderColor: 'rgba(0,0,0,.2)' }} /> A analisar...</> : 'Continuar — Responder Perguntas →'}
                                 </button>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
 
                     {/* PASSO 3: FORA DO ÂMBITO */}
                     {passo === 'fora_escopo' && (

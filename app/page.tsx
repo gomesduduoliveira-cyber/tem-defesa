@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const DEPOIMENTOS = [
     { texto: 'Recebi uma coima de €250 por excesso de velocidade. A IA identificou que o radar não tinha sinalização adequada no local. Apresentei a defesa online na ANSR e o processo foi arquivado.', nome: 'João F.', cidade: 'Lisboa', inicial: 'J', resultado: 'Coima anulada' },
@@ -29,25 +30,60 @@ const S = {
 };
 
 export default function Home() {
+    const [menuOpen, setMenuOpen] = useState(false);
 
     return (
         <div style={{ minHeight: '100vh', background: S.bg, color: S.text, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
 
             {/* ── NAV ── */}
-            <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(11,14,24,.95)', backdropFilter: 'blur(10px)', borderBottom: S.border, padding: '0 24px' }}>
-                <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 60 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 20, fontWeight: 800, color: S.gold }}>TEM</span>
-                        <span style={{ fontSize: 20, fontWeight: 800 }}>Defesa</span>
+            <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(11,14,24,.96)', backdropFilter: 'blur(12px)', borderBottom: S.border }}>
+                <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {/* Logo */}
+                    <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0 }}>
+                        <Image src="/logo.svg" alt="TEM Defesa" width={150} height={45} style={{ width: 'auto', height: 44 }} priority />
+                    </Link>
+
+                    {/* Links desktop */}
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }} className="nav-desktop-links">
+                        <a href="#como-funciona" style={{ padding: '8px 12px', fontSize: 15, fontWeight: 700, color: S.muted, textDecoration: 'none' }}>Como Funciona</a>
+                        <a href="#objections" style={{ padding: '8px 12px', fontSize: 15, fontWeight: 700, color: S.muted, textDecoration: 'none' }}>Dúvidas</a>
+                        <a href="#precos" style={{ padding: '8px 12px', fontSize: 15, fontWeight: 700, color: S.muted, textDecoration: 'none' }}>Preços</a>
+                        <Link href="/perguntas-frequentes" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', fontSize: 14, fontWeight: 700, color: S.gold, background: 'rgba(201,151,62,.1)', border: '1px solid rgba(201,151,62,.3)', borderRadius: 20, textDecoration: 'none', whiteSpace: 'nowrap' as const }}>❓ Posso recorrer?</Link>
+                        <Link href="/login" style={{ padding: '8px 14px', fontSize: 15, fontWeight: 700, color: S.muted, textDecoration: 'none' }}>Entrar</Link>
+                        <Link href="/planos" style={{ padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none' }}>Contestar coima →</Link>
                     </div>
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <a href="#como-funciona" style={{ padding: '8px 16px', borderRadius: 8, fontSize: 14, color: S.muted, textDecoration: 'none' }}>Como Funciona</a>
-                        <a href="#objections" style={{ padding: '8px 16px', borderRadius: 8, fontSize: 14, color: S.muted, textDecoration: 'none' }}>Dúvidas</a>
-                        <a href="#precos" style={{ padding: '8px 16px', borderRadius: 8, fontSize: 14, color: S.muted, textDecoration: 'none' }}>Preços</a>
-                        <Link href="/login" style={{ padding: '8px 16px', borderRadius: 8, fontSize: 14, color: S.muted, textDecoration: 'none' }}>Entrar</Link>
-                        <Link href="/login" style={{ padding: '9px 20px', borderRadius: 8, fontSize: 14, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none' }}>Contestar coima →</Link>
-                    </div>
+
+                    {/* Hamburger mobile */}
+                    <button onClick={() => setMenuOpen(!menuOpen)}
+                        style={{ display: 'none', background: 'none', border: 'none', color: S.text, fontSize: 24, cursor: 'pointer', padding: 4 }}
+                        className="nav-hamburger">
+                        {menuOpen ? '✕' : '☰'}
+                    </button>
                 </div>
+
+                {/* Menu mobile */}
+                {menuOpen && (
+                    <div style={{ background: S.bg2, borderTop: S.border, padding: '12px 20px 20px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {[['#como-funciona', 'Como Funciona'], ['#objections', 'Dúvidas'], ['#precos', 'Preços']].map(([h, l]) => (
+                            <a key={h} href={h} onClick={() => setMenuOpen(false)}
+                                style={{ padding: '10px 0', fontSize: 16, fontWeight: 700, color: S.muted, textDecoration: 'none', borderBottom: S.border }}>
+                                {l}
+                            </a>
+                        ))}
+                        <Link href="/perguntas-frequentes" onClick={() => setMenuOpen(false)}
+                            style={{ padding: '10px 0', fontSize: 16, fontWeight: 700, color: S.gold, textDecoration: 'none', borderBottom: S.border }}>
+                            ❓ Posso recorrer?
+                        </Link>
+                        <Link href="/login" onClick={() => setMenuOpen(false)}
+                            style={{ padding: '10px 0', fontSize: 16, fontWeight: 700, color: S.muted, textDecoration: 'none', borderBottom: S.border }}>
+                            Entrar
+                        </Link>
+                        <Link href="/planos" onClick={() => setMenuOpen(false)}
+                            style={{ marginTop: 12, padding: '13px', borderRadius: 10, background: S.gold, color: '#0b0e18', fontWeight: 700, fontSize: 15, textDecoration: 'none', textAlign: 'center' as const }}>
+                            Contestar coima →
+                        </Link>
+                    </div>
+                )}
             </nav>
 
             {/* ── BLOCO 1: HERO ── */}
@@ -62,7 +98,7 @@ export default function Home() {
                 <p style={{ fontSize: 'clamp(1rem, 2vw, 1.15rem)', color: S.muted, lineHeight: 1.7, maxWidth: 620, margin: '0 auto 28px' }}>
                     IA especializada no Código da Estrada analisa o auto, identifica vícios formais e elabora a defesa completa a partir de €9,90 — sem advogado, sem complicações.
                 </p>
-                <Link href="/login" style={{ padding: '16px 36px', borderRadius: 10, fontSize: 16, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>
+                <Link href="/planos" style={{ padding: '16px 36px', borderRadius: 10, fontSize: 16, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>
                     Contestar a minha coima — a partir de €9,90
                 </Link>
                 <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}>
@@ -196,7 +232,9 @@ export default function Home() {
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 16, alignItems: 'start' }}>
                         {/* 1 crédito */}
-                        <div style={{ background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center' }}>
+                        <Link href="/planos" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center', transition: 'border-color .2s', cursor: 'pointer' }}
+                            onMouseOver={e => (e.currentTarget as HTMLElement).style.borderColor = '#c9973e'}
+                            onMouseOut={e => (e.currentTarget as HTMLElement).style.borderColor = '#1e2540'}>
                             <p style={{ fontSize: 12, fontWeight: 700, color: S.muted, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>1 Defesa</p>
                             <p style={{ fontSize: '2.4rem', fontWeight: 800, color: S.text, margin: '0 0 4px', lineHeight: 1 }}>€9<span style={{ fontSize: '1.2rem' }}>,90</span></p>
                             <p style={{ fontSize: 12, color: S.muted, margin: '0 0 24px' }}>por defesa gerada</p>
@@ -205,11 +243,11 @@ export default function Home() {
                                     <li key={f} style={{ fontSize: 13, color: S.muted, display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ color: S.green, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}</li>
                                 ))}
                             </ul>
-                            <Link href="/login" style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' as const }}>Começar</Link>
-                        </div>
+                            <div style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textAlign: 'center' as const }}>Comprar 1 defesa →</div>
+                        </Link>
 
                         {/* Pack 3 — POPULAR */}
-                        <div style={{ background: S.bg2, border: `2px solid ${S.gold}`, borderRadius: 16, padding: '28px 22px', textAlign: 'center', position: 'relative' as const }}>
+                        <Link href="/planos" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: S.bg2, border: `2px solid ${S.gold}`, borderRadius: 16, padding: '28px 22px', textAlign: 'center', position: 'relative' as const, cursor: 'pointer' }}>
                             <div style={{ position: 'absolute' as const, top: -12, left: '50%', transform: 'translateX(-50%)', background: S.gold, color: '#0b0e18', fontSize: 11, fontWeight: 700, padding: '3px 14px', borderRadius: 20, whiteSpace: 'nowrap' as const }}>MAIS POPULAR</div>
                             <p style={{ fontSize: 12, fontWeight: 700, color: S.gold, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>Pack 3 Defesas</p>
                             <p style={{ fontSize: '2.4rem', fontWeight: 800, color: S.text, margin: '0 0 4px', lineHeight: 1 }}>€24<span style={{ fontSize: '1.2rem' }}>,90</span></p>
@@ -219,11 +257,13 @@ export default function Home() {
                                     <li key={f} style={{ fontSize: 13, color: S.muted, display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ color: S.green, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}</li>
                                 ))}
                             </ul>
-                            <Link href="/login" style={{ display: 'block', padding: 11, borderRadius: 9, background: S.gold, color: '#0b0e18', fontWeight: 700, fontSize: 14, textDecoration: 'none', textAlign: 'center' as const }}>Escolher Pack 3</Link>
-                        </div>
+                            <div style={{ display: 'block', padding: 11, borderRadius: 9, background: S.gold, color: '#0b0e18', fontWeight: 700, fontSize: 14, textAlign: 'center' as const }}>Escolher Pack 3 →</div>
+                        </Link>
 
                         {/* Pack 10 */}
-                        <div style={{ background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center' }}>
+                        <Link href="/planos" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center', transition: 'border-color .2s', cursor: 'pointer' }}
+                            onMouseOver={e => (e.currentTarget as HTMLElement).style.borderColor = '#4aaa6a'}
+                            onMouseOut={e => (e.currentTarget as HTMLElement).style.borderColor = '#1e2540'}>
                             <div style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 10, background: 'rgba(74,170,106,.12)', border: '1px solid rgba(74,170,106,.25)', fontSize: 11, fontWeight: 700, color: S.green, marginBottom: 12 }}>MELHOR VALOR</div>
                             <p style={{ fontSize: 12, fontWeight: 700, color: S.muted, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>Pack 10 Defesas</p>
                             <p style={{ fontSize: '2.4rem', fontWeight: 800, color: S.text, margin: '0 0 4px', lineHeight: 1 }}>€69<span style={{ fontSize: '1.2rem' }}>,90</span></p>
@@ -233,11 +273,13 @@ export default function Home() {
                                     <li key={f} style={{ fontSize: 13, color: S.muted, display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ color: S.green, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}</li>
                                 ))}
                             </ul>
-                            <Link href="/login" style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' as const }}>Escolher Pack 10</Link>
-                        </div>
+                            <div style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textAlign: 'center' as const }}>Escolher Pack 10 →</div>
+                        </Link>
 
                         {/* Subscrição */}
-                        <div style={{ background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center' }}>
+                        <Link href="/planos" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center', transition: 'border-color .2s', cursor: 'pointer' }}
+                            onMouseOver={e => (e.currentTarget as HTMLElement).style.borderColor = '#c9973e'}
+                            onMouseOut={e => (e.currentTarget as HTMLElement).style.borderColor = '#1e2540'}>
                             <p style={{ fontSize: 12, fontWeight: 700, color: S.muted, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>Subscrição Mensal</p>
                             <p style={{ fontSize: '2.4rem', fontWeight: 800, color: S.text, margin: '0 0 4px', lineHeight: 1 }}>€19<span style={{ fontSize: '1.2rem' }}>,90</span></p>
                             <p style={{ fontSize: 12, color: S.muted, margin: '0 0 24px' }}>por mês · 5 defesas/mês</p>
@@ -246,8 +288,8 @@ export default function Home() {
                                     <li key={f} style={{ fontSize: 13, color: S.muted, display: 'flex', gap: 8, alignItems: 'center' }}><span style={{ color: S.green, fontWeight: 700, flexShrink: 0 }}>✓</span>{f}</li>
                                 ))}
                             </ul>
-                            <Link href="/login" style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textDecoration: 'none', textAlign: 'center' as const }}>Subscrever</Link>
-                        </div>
+                            <div style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textAlign: 'center' as const }}>Subscrever →</div>
+                        </Link>
                     </div>
 
                     {/* Selos de segurança */}
@@ -267,7 +309,7 @@ export default function Home() {
                 </div>
                 <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2rem)', fontWeight: 700, marginBottom: 12 }}>Pronto para contestar a sua coima?</h2>
                 <p style={{ color: S.muted, marginBottom: 28, fontSize: 15, maxWidth: 500, margin: '0 auto 28px' }}>Não deixe o prazo passar. Gere a sua defesa em 5 minutos e submeta-a hoje.</p>
-                <Link href="/login" style={{ padding: '16px 40px', borderRadius: 10, fontSize: 17, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>
+                <Link href="/planos" style={{ padding: '16px 40px', borderRadius: 10, fontSize: 17, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>
                     Contestar a minha coima agora
                 </Link>
                 <p style={{ fontSize: 12, color: '#4a5060', margin: 0 }}>🛡️ Devolução garantida se não houver fundamento · A informação disponibilizada não constitui aconselhamento jurídico</p>
@@ -286,6 +328,17 @@ export default function Home() {
                     © {new Date().getFullYear()} TEM Defesa. A informação disponibilizada não constitui aconselhamento jurídico.
                 </p>
             </footer>
+
+            {/* ── RESPONSIVE OVERRIDES ── */}
+            <style>{`
+                @media (max-width: 640px) {
+                    .nav-desktop-links { display: none !important; }
+                    .nav-hamburger     { display: flex !important; }
+                }
+                @media (min-width: 641px) {
+                    .nav-hamburger { display: none !important; }
+                }
+            `}</style>
         </div>
     );
 }
