@@ -53,8 +53,8 @@ export default function Login() {
     // Password helpers
     const temMinimo = password.length >= 8;
     const temMaiuscula = /[A-Z]/.test(password);
-    const temEspecial = /[^a-zA-Z0-9\s]/.test(password);
-    const senhaValida = temMinimo && temMaiuscula && temEspecial;
+    const temNumero = /[0-9]/.test(password);
+    const senhaValida = temMinimo && temMaiuscula && temNumero;
 
     const [morada, setMorada] = useState('');
     const [codigoPostal, setCodigoPostal] = useState('');
@@ -82,7 +82,7 @@ export default function Login() {
             // Validação da palavra-passe (somente no registo)
             if (!isLogin && !senhaValida) {
                 setIsError(true);
-                setMessage('A palavra-passe não cumpre os requisitos: mínimo 8 caracteres, 1 letra maiúscula e 1 caractere especial.');
+                setMessage('A palavra-passe não cumpre os requisitos: mínimo 8 caracteres, 1 letra maiúscula e 1 número.');
                 setLoading(false); return;
             }
             // Verificação Turnstile
@@ -282,7 +282,7 @@ export default function Login() {
                                                 {[
                                                     { ok: temMinimo, label: 'Mínimo 8 caracteres' },
                                                     { ok: temMaiuscula, label: '1 letra maiúscula (A-Z)' },
-                                                    { ok: temEspecial, label: '1 caractere especial (!@#$%...)' },
+                                                    { ok: temNumero, label: '1 número (0-9)' },
                                                 ].map(({ ok, label }) => (
                                                     <p key={label} style={{ fontSize: 11, margin: 0, display: 'flex', gap: 5, alignItems: 'center' }}>
                                                         <span style={{ color: ok ? '#4aaa6a' : '#e05050', fontWeight: 700 }}>{ok ? '✓' : '✗'}</span>
