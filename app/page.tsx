@@ -86,39 +86,47 @@ export default function Home() {
                 )}
             </nav>
 
-            {/* ── BLOCO 1: HERO ── */}
-            <section style={{ maxWidth: 900, margin: '0 auto', padding: '80px 24px 60px', textAlign: 'center' }}>
-                <div style={{ display: 'inline-block', padding: '6px 16px', borderRadius: 20, background: 'rgba(201,151,62,.12)', border: '1px solid rgba(201,151,62,.25)', fontSize: 13, color: S.gold, fontWeight: 600, marginBottom: 24 }}>
-                    🇵🇹 Especializado no Código da Estrada Português
-                </div>
-                <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.2rem)', fontWeight: 800, lineHeight: 1.15, marginBottom: 20 }}>
-                    Conteste a sua coima de trânsito<br />
-                    <span style={{ color: S.gold }}>em 5 minutos — sem advogado</span>
-                </h1>
-                <p style={{ fontSize: 'clamp(1rem, 2vw, 1.15rem)', color: S.muted, lineHeight: 1.7, maxWidth: 620, margin: '0 auto 28px' }}>
-                    IA especializada no Código da Estrada analisa o auto, identifica vícios formais e elabora a defesa completa a partir de €9,90 — sem advogado, sem complicações.
-                </p>
-                <Link href="/planos" style={{ padding: '16px 36px', borderRadius: 10, fontSize: 16, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>
-                    Contestar a minha coima — a partir de €9,90
-                </Link>
-                <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}>
-                    {['✓ Base jurídica CE/RGCO', '✓ Documento pronto a submeter', '✓ Disponível 24h', '✓ RGPD compliant'].map(b => (
-                        <span key={b} style={{ fontSize: 13, color: S.muted }}>{b}</span>
-                    ))}
-                </div>
+            {/* ── BLOCO 1: HERO (foto: Unsplash — estrada à noite, licença Unsplash) ── */}
+            <section style={{
+                position: 'relative',
+                backgroundImage: 'linear-gradient(180deg, rgba(11,14,24,.8) 0%, rgba(11,14,24,.62) 45%, rgba(11,14,24,.9) 82%, #0b0e18 100%), url(/hero-road.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center 60%',
+                borderBottom: S.border,
+            }}>
+                <div style={{ maxWidth: 900, margin: '0 auto', padding: '92px 24px 72px', textAlign: 'center' }}>
+                    <div style={{ display: 'inline-block', padding: '6px 16px', borderRadius: 20, background: 'rgba(201,151,62,.14)', border: '1px solid rgba(201,151,62,.35)', backdropFilter: 'blur(6px)', fontSize: 13, color: S.gold, fontWeight: 700, marginBottom: 26 }}>
+                        🇵🇹 Especializado no Código da Estrada Português
+                    </div>
+                    <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.3rem)', fontWeight: 800, lineHeight: 1.13, marginBottom: 20, textShadow: '0 2px 24px rgba(0,0,0,.55)' }}>
+                        Conteste a sua coima de trânsito<br />
+                        <span style={{ color: S.gold }}>em 5 minutos — sem advogado</span>
+                    </h1>
+                    <p style={{ fontSize: 'clamp(1rem, 2vw, 1.15rem)', color: '#aab4c8', lineHeight: 1.7, maxWidth: 620, margin: '0 auto 28px', textShadow: '0 1px 12px rgba(0,0,0,.5)' }}>
+                        IA especializada no Código da Estrada analisa o auto, identifica vícios formais e elabora a defesa completa a partir de €9,90 — sem advogado, sem complicações.
+                    </p>
+                    <Link href="/planos" style={{ padding: '16px 36px', borderRadius: 10, fontSize: 16, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16, boxShadow: '0 6px 28px rgba(201,151,62,.4)' }}>
+                        Contestar a minha coima — a partir de €9,90
+                    </Link>
+                    <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: 44 }}>
+                        {['✓ Base jurídica CE/RGCO', '✓ Documento pronto a submeter', '✓ Disponível 24h', '✓ RGPD compliant'].map(b => (
+                            <span key={b} style={{ fontSize: 13, color: '#aab4c8', textShadow: '0 1px 8px rgba(0,0,0,.6)' }}>{b}</span>
+                        ))}
+                    </div>
 
-                {/* Urgência prazos */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, maxWidth: 720, margin: '0 auto' }}>
-                    {[
-                        { prazo: '15 dias úteis', label: 'Defesa administrativa', cor: S.red },
-                        { prazo: '20 dias úteis', label: 'Impugnação judicial', cor: S.gold },
-                        { prazo: '2 anos', label: 'Prescrição máxima', cor: S.green },
-                    ].map(({ prazo, label, cor }) => (
-                        <div key={label} style={{ background: S.bg2, border: `1px solid ${cor}30`, borderRadius: 12, padding: '16px 14px', textAlign: 'center' }}>
-                            <p style={{ fontSize: '1.5rem', fontWeight: 800, color: cor, margin: '0 0 4px' }}>{prazo}</p>
-                            <p style={{ fontSize: 12, color: S.muted, margin: 0 }}>{label}</p>
-                        </div>
-                    ))}
+                    {/* Urgência prazos — glassmorphism sobre a foto */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, maxWidth: 720, margin: '0 auto' }}>
+                        {[
+                            { prazo: '15 dias úteis', label: 'Defesa administrativa', cor: S.red },
+                            { prazo: '20 dias úteis', label: 'Impugnação judicial', cor: S.gold },
+                            { prazo: '2 anos', label: 'Prescrição máxima', cor: S.green },
+                        ].map(({ prazo, label, cor }) => (
+                            <div key={label} style={{ background: 'rgba(17,21,38,.6)', backdropFilter: 'blur(10px)', border: `1px solid ${cor}45`, borderRadius: 14, padding: '18px 14px', textAlign: 'center', boxShadow: '0 10px 32px rgba(0,0,0,.4)' }}>
+                                <p style={{ fontSize: '1.5rem', fontWeight: 800, color: cor, margin: '0 0 4px' }}>{prazo}</p>
+                                <p style={{ fontSize: 12, color: '#aab4c8', margin: 0 }}>{label}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </section>
 
@@ -302,14 +310,14 @@ export default function Home() {
             </section>
 
             {/* ── CTA FINAL ── */}
-            <section style={{ background: 'linear-gradient(135deg, rgba(201,151,62,.1) 0%, rgba(11,14,24,0) 100%)', borderTop: '1px solid rgba(201,151,62,.2)', padding: '70px 24px', textAlign: 'center' }}>
+            <section style={{ backgroundImage: 'linear-gradient(180deg, #0b0e18 0%, rgba(11,14,24,.86) 35%, rgba(11,14,24,.86) 70%, #0b0e18 100%), url(/hero-road.jpg)', backgroundSize: 'cover', backgroundPosition: 'center 40%', borderTop: '1px solid rgba(201,151,62,.2)', padding: '80px 24px', textAlign: 'center' }}>
                 {/* Urgência */}
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(224,80,80,.1)', border: '1px solid rgba(224,80,80,.25)', borderRadius: 20, padding: '6px 16px', fontSize: 13, color: S.red, fontWeight: 600, marginBottom: 24 }}>
                     ⏱️ O prazo de 15 dias úteis está a contar — cada dia perdido é uma oportunidade de defesa
                 </div>
                 <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2rem)', fontWeight: 700, marginBottom: 12 }}>Pronto para contestar a sua coima?</h2>
                 <p style={{ color: S.muted, marginBottom: 28, fontSize: 15, maxWidth: 500, margin: '0 auto 28px' }}>Não deixe o prazo passar. Gere a sua defesa em 5 minutos e submeta-a hoje.</p>
-                <Link href="/planos" style={{ padding: '16px 40px', borderRadius: 10, fontSize: 17, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16 }}>
+                <Link href="/planos" style={{ padding: '16px 40px', borderRadius: 10, fontSize: 17, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16, boxShadow: '0 6px 28px rgba(201,151,62,.4)' }}>
                     Contestar a minha coima agora
                 </Link>
                 <p style={{ fontSize: 12, color: '#4a5060', margin: 0 }}>🛡️ Devolução garantida se não houver fundamento · A informação disponibilizada não constitui aconselhamento jurídico</p>
