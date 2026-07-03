@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -31,6 +31,18 @@ const S = {
 
 export default function Home() {
     const [menuOpen, setMenuOpen] = useState(false);
+
+    // Animação subtil: revela elementos .reveal ao entrarem na viewport
+    useEffect(() => {
+        const els = document.querySelectorAll('.reveal');
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { (e.target as HTMLElement).classList.add('in'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.15 });
+        els.forEach(el => io.observe(el));
+        return () => io.disconnect();
+    }, []);
 
     return (
         <div style={{ minHeight: '100vh', background: S.bg, color: S.text, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
@@ -162,14 +174,90 @@ export default function Home() {
                         { n: '02', icon: '✏️', titulo: 'Confirme os dados', desc: 'Verifique os dados extraídos e corrija se necessário. Tudo editável antes de avançar.' },
                         { n: '03', icon: '💬', titulo: 'Responda às perguntas', desc: 'A IA faz perguntas simples sobre o que aconteceu e identifica os vícios formais sozinha — sem jargão jurídico.' },
                         { n: '04', icon: '⚖️', titulo: 'Transfira a defesa', desc: 'Documento completo fundamentado no CE e RGCO, com guia de submissão incluído. Pronto para a ANSR.' },
-                    ].map(({ n, icon, titulo, desc }) => (
-                        <div key={n} style={{ background: S.bg2, padding: '28px 22px' }}>
+                    ].map(({ n, icon, titulo, desc }, i) => (
+                        <div key={n} className="reveal" style={{ background: S.bg2, padding: '28px 22px', transitionDelay: `${i * 90}ms` }}>
                             <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(201,151,62,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 16 }}>{icon}</div>
                             <p style={{ fontSize: 12, color: S.gold, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '.06em', marginBottom: 8 }}>Passo {n}</p>
                             <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>{titulo}</h3>
                             <p style={{ fontSize: 13, color: S.muted, lineHeight: 1.6, margin: 0 }}>{desc}</p>
                         </div>
                     ))}
+                </div>
+            </section>
+
+            {/* ── BLOCO 3A: MOCKUP DO DOCUMENTO ── */}
+            <section style={{ background: S.bgAlt, borderTop: S.border, padding: '72px 24px', overflow: 'hidden' }}>
+                <div style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 48, alignItems: 'center' }}>
+                    {/* Texto */}
+                    <div className="reveal">
+                        <p style={{ fontSize: 11, color: S.gold, fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: 12 }}>O que recebe</p>
+                        <h2 style={{ fontSize: 'clamp(1.6rem,3vw,2.2rem)', fontWeight: 700, marginBottom: 16, lineHeight: 1.2 }}>
+                            Uma defesa completa,<br />pronta a submeter
+                        </h2>
+                        <p style={{ color: S.muted, fontSize: 15, lineHeight: 1.7, marginBottom: 24 }}>
+                            Documento estruturado como peça jurídica profissional — o mesmo formato que um advogado rodoviário entregaria.
+                        </p>
+                        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 28px', display: 'flex', flexDirection: 'column' as const, gap: 12 }}>
+                            {[
+                                'Fundamentação no Código da Estrada e RGCO',
+                                'Vícios formais identificados pela IA no seu auto',
+                                'Estrutura completa: factos, direito e pedidos',
+                                'Pedido de arquivamento e pedido subsidiário',
+                                'Guia de submissão incluído (ANSR, correio, balcão)',
+                            ].map(f => (
+                                <li key={f} style={{ fontSize: 14, color: S.text, display: 'flex', gap: 10, alignItems: 'flex-start', lineHeight: 1.5 }}>
+                                    <span style={{ color: S.gold, flexShrink: 0, fontWeight: 700 }}>✦</span>{f}
+                                </li>
+                            ))}
+                        </ul>
+                        <Link href="/planos" style={{ display: 'inline-block', padding: '13px 28px', borderRadius: 10, background: S.gold, color: '#0b0e18', fontWeight: 700, fontSize: 14, textDecoration: 'none', boxShadow: '0 6px 24px rgba(201,151,62,.3)' }}>
+                            Gerar a minha defesa →
+                        </Link>
+                    </div>
+
+                    {/* Mockup do documento */}
+                    <div className="reveal" style={{ position: 'relative', maxWidth: 430, margin: '0 auto', width: '100%', transitionDelay: '120ms' }}>
+                        <div style={{ position: 'absolute', inset: '-30px', background: 'radial-gradient(ellipse at center, rgba(201,151,62,.14) 0%, transparent 65%)', pointerEvents: 'none' }} />
+                        <div style={{ position: 'relative', background: '#f6f3ea', borderRadius: 10, padding: '30px 28px 26px', boxShadow: '0 30px 70px rgba(0,0,0,.55), 0 4px 18px rgba(0,0,0,.3)', transform: 'rotate(-1.6deg)', color: '#2b2b33' }}>
+                            {/* Selo */}
+                            <div style={{ position: 'absolute', top: -16, right: -14, width: 84, height: 84, borderRadius: '50%', background: S.gold, color: '#0b0e18', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', transform: 'rotate(9deg)', boxShadow: '0 8px 24px rgba(201,151,62,.45)', textAlign: 'center' as const, lineHeight: 1.15 }}>
+                                <span style={{ fontSize: 15 }}>⚖️</span>
+                                <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.04em' }}>CE · RGCO</span>
+                                <span style={{ fontSize: 7, fontWeight: 700 }}>DL 433/82</span>
+                            </div>
+                            {/* Cabeçalho do documento */}
+                            <p style={{ fontSize: 8.5, letterSpacing: '.04em', textAlign: 'center' as const, color: '#5a5a64', margin: '0 0 4px', textTransform: 'uppercase' as const }}>Exmo.(a) Sr.(a) Diretor(a) da Autoridade Nacional</p>
+                            <p style={{ fontSize: 8.5, letterSpacing: '.04em', textAlign: 'center' as const, color: '#5a5a64', margin: '0 0 16px', textTransform: 'uppercase' as const }}>de Segurança Rodoviária — ANSR</p>
+                            <p style={{ fontSize: 12.5, fontWeight: 800, textAlign: 'center' as const, margin: '0 0 18px', letterSpacing: '.03em', color: '#1c1c24' }}>DEFESA ESCRITA<br />Processo de Contraordenação</p>
+                            {/* I — Dos Factos */}
+                            <p style={{ fontSize: 9.5, fontWeight: 800, margin: '0 0 7px', color: '#1c1c24' }}>I – DOS FACTOS</p>
+                            {[92, 100, 97, 60].map((w, i) => (
+                                <div key={`f${i}`} style={{ height: 6, borderRadius: 3, background: '#ddd8c8', width: `${w}%`, marginBottom: 6 }} />
+                            ))}
+                            {/* II — Do Direito */}
+                            <p style={{ fontSize: 9.5, fontWeight: 800, margin: '12px 0 7px', color: '#1c1c24' }}>II – DO DIREITO</p>
+                            {[100, 95].map((w, i) => (
+                                <div key={`j${i}`} style={{ height: 6, borderRadius: 3, background: '#ddd8c8', width: `${w}%`, marginBottom: 6 }} />
+                            ))}
+                            {/* Destaque legal */}
+                            <div style={{ borderLeft: `3px solid ${S.gold}`, background: 'rgba(201,151,62,.09)', borderRadius: '0 6px 6px 0', padding: '8px 10px', margin: '8px 0 10px' }}>
+                                <p style={{ fontSize: 8, color: '#4a4436', margin: 0, lineHeight: 1.55, fontStyle: 'italic' }}>
+                                    "Nos processos de contraordenação são assegurados ao arguido os direitos de audiência e defesa" — Art. 50.º do RGCO; Art. 32.º, n.º 10, CRP
+                                </p>
+                            </div>
+                            {[98, 72].map((w, i) => (
+                                <div key={`k${i}`} style={{ height: 6, borderRadius: 3, background: '#ddd8c8', width: `${w}%`, marginBottom: 6 }} />
+                            ))}
+                            {/* III — Pedidos */}
+                            <p style={{ fontSize: 9.5, fontWeight: 800, margin: '12px 0 7px', color: '#1c1c24' }}>III – DOS PEDIDOS</p>
+                            <p style={{ fontSize: 8.5, margin: '0 0 5px', color: '#3c3c46', lineHeight: 1.5 }}>a) O <strong>ARQUIVAMENTO</strong> do processo de contraordenação;</p>
+                            <p style={{ fontSize: 8.5, margin: '0 0 14px', color: '#3c3c46', lineHeight: 1.5 }}>b) Subsidiariamente, a <strong>redução da coima</strong> ao mínimo legal.</p>
+                            {/* Assinatura */}
+                            <div style={{ width: 150, margin: '14px auto 4px', borderTop: '1px solid #8a8574' }} />
+                            <p style={{ fontSize: 8, textAlign: 'center' as const, color: '#5a5a64', margin: 0 }}>Nome do Arguido · NIF 000 000 000</p>
+                        </div>
+                        <p style={{ fontSize: 11, color: '#4a5060', textAlign: 'center' as const, marginTop: 18 }}>Ilustração do documento gerado · download imediato</p>
+                    </div>
                 </div>
             </section>
 
@@ -189,8 +277,8 @@ export default function Home() {
                         </div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-                        {DEPOIMENTOS.map((d) => (
-                            <div key={d.nome} style={{ background: S.bg2, border: S.border, borderRadius: 14, padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        {DEPOIMENTOS.map((d, i) => (
+                            <div key={d.nome} className="reveal" style={{ background: S.bg2, border: S.border, borderRadius: 14, padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: 16, transitionDelay: `${i * 100}ms` }}>
                                 <p style={{ fontSize: 13, color: S.gold, letterSpacing: 1 }}>★★★★★</p>
                                 <p style={{ fontSize: '0.9375rem', color: S.muted, lineHeight: 1.7, fontStyle: 'italic', margin: 0 }}>"{d.texto}"</p>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginTop: 'auto' }}>
@@ -240,6 +328,7 @@ export default function Home() {
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 16, alignItems: 'start' }}>
                         {/* 1 crédito */}
+                        <div className="reveal">
                         <Link href="/planos" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center', transition: 'border-color .2s', cursor: 'pointer' }}
                             onMouseOver={e => (e.currentTarget as HTMLElement).style.borderColor = '#c9973e'}
                             onMouseOut={e => (e.currentTarget as HTMLElement).style.borderColor = '#1e2540'}>
@@ -253,8 +342,10 @@ export default function Home() {
                             </ul>
                             <div style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textAlign: 'center' as const }}>Comprar 1 defesa →</div>
                         </Link>
+                        </div>
 
                         {/* Pack 3 — POPULAR */}
+                        <div className="reveal" style={{ transitionDelay: '80ms' }}>
                         <Link href="/planos" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: S.bg2, border: `2px solid ${S.gold}`, borderRadius: 16, padding: '28px 22px', textAlign: 'center', position: 'relative' as const, cursor: 'pointer' }}>
                             <div style={{ position: 'absolute' as const, top: -12, left: '50%', transform: 'translateX(-50%)', background: S.gold, color: '#0b0e18', fontSize: 11, fontWeight: 700, padding: '3px 14px', borderRadius: 20, whiteSpace: 'nowrap' as const }}>MAIS POPULAR</div>
                             <p style={{ fontSize: 12, fontWeight: 700, color: S.gold, textTransform: 'uppercase' as const, letterSpacing: '.08em', margin: '0 0 16px' }}>Pack 3 Defesas</p>
@@ -267,8 +358,10 @@ export default function Home() {
                             </ul>
                             <div style={{ display: 'block', padding: 11, borderRadius: 9, background: S.gold, color: '#0b0e18', fontWeight: 700, fontSize: 14, textAlign: 'center' as const }}>Escolher Pack 3 →</div>
                         </Link>
+                        </div>
 
                         {/* Pack 10 */}
+                        <div className="reveal" style={{ transitionDelay: '160ms' }}>
                         <Link href="/planos" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center', transition: 'border-color .2s', cursor: 'pointer' }}
                             onMouseOver={e => (e.currentTarget as HTMLElement).style.borderColor = '#4aaa6a'}
                             onMouseOut={e => (e.currentTarget as HTMLElement).style.borderColor = '#1e2540'}>
@@ -283,8 +376,10 @@ export default function Home() {
                             </ul>
                             <div style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textAlign: 'center' as const }}>Escolher Pack 10 →</div>
                         </Link>
+                        </div>
 
                         {/* Subscrição */}
+                        <div className="reveal" style={{ transitionDelay: '240ms' }}>
                         <Link href="/planos" style={{ display: 'block', textDecoration: 'none', color: 'inherit', background: S.bg2, border: S.border, borderRadius: 16, padding: '28px 22px', textAlign: 'center', transition: 'border-color .2s', cursor: 'pointer' }}
                             onMouseOver={e => (e.currentTarget as HTMLElement).style.borderColor = '#c9973e'}
                             onMouseOut={e => (e.currentTarget as HTMLElement).style.borderColor = '#1e2540'}>
@@ -298,6 +393,7 @@ export default function Home() {
                             </ul>
                             <div style={{ display: 'block', padding: 11, borderRadius: 9, background: 'transparent', border: '1px solid #2a304a', color: S.text, fontWeight: 600, fontSize: 14, textAlign: 'center' as const }}>Subscrever →</div>
                         </Link>
+                        </div>
                     </div>
 
                     {/* Selos de segurança */}
@@ -345,6 +441,11 @@ export default function Home() {
                 }
                 @media (min-width: 641px) {
                     .nav-hamburger { display: none !important; }
+                }
+                .reveal { opacity: 0; transform: translateY(18px); transition: opacity .65s cubic-bezier(.2,.7,.3,1), transform .65s cubic-bezier(.2,.7,.3,1); }
+                .reveal.in { opacity: 1; transform: none; }
+                @media (prefers-reduced-motion: reduce) {
+                    .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
                 }
             `}</style>
         </div>
