@@ -29,6 +29,27 @@ const S = {
     red: '#e05050' as const,
 };
 
+// ── Ícones SVG (estilo Lucide, monocromáticos, herdam a cor via currentColor) ──
+const ICON_PATHS: Record<string, string> = {
+    file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
+    edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+    scale: '<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
+    message: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+    lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+    card: '<rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/>',
+    refund: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+    timer: '<path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/>',
+    menu: '<path d="M4 12h16"/><path d="M4 6h16"/><path d="M4 18h16"/>',
+    close: '<path d="M18 6 6 18"/><path d="M6 6l12 12"/>',
+};
+function Ico({ name, size = 24, color = 'currentColor', style }: { name: keyof typeof ICON_PATHS; size?: number; color?: string; style?: React.CSSProperties }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" style={{ flexShrink: 0, display: 'block', ...style }} dangerouslySetInnerHTML={{ __html: ICON_PATHS[name] }} />
+    );
+}
+
 export default function Home() {
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -60,16 +81,17 @@ export default function Home() {
                         <a href="#como-funciona" style={{ padding: '8px 12px', fontSize: 15, fontWeight: 700, color: S.muted, textDecoration: 'none' }}>Como Funciona</a>
                         <a href="#objections" style={{ padding: '8px 12px', fontSize: 15, fontWeight: 700, color: S.muted, textDecoration: 'none' }}>Dúvidas</a>
                         <a href="#precos" style={{ padding: '8px 12px', fontSize: 15, fontWeight: 700, color: S.muted, textDecoration: 'none' }}>Preços</a>
-                        <Link href="/perguntas-frequentes" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', fontSize: 14, fontWeight: 700, color: S.gold, background: 'rgba(201,151,62,.1)', border: '1px solid rgba(201,151,62,.3)', borderRadius: 20, textDecoration: 'none', whiteSpace: 'nowrap' as const }}>❓ Posso recorrer?</Link>
+                        <Link href="/perguntas-frequentes" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', fontSize: 14, fontWeight: 700, color: S.gold, background: 'rgba(201,151,62,.1)', border: '1px solid rgba(201,151,62,.3)', borderRadius: 20, textDecoration: 'none', whiteSpace: 'nowrap' as const }}><Ico name="help" size={15} /> Posso recorrer?</Link>
                         <Link href="/login" style={{ padding: '8px 14px', fontSize: 15, fontWeight: 700, color: S.muted, textDecoration: 'none' }}>Entrar</Link>
                         <Link href="/planos" style={{ padding: '9px 18px', borderRadius: 8, fontSize: 14, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none' }}>Contestar coima →</Link>
                     </div>
 
                     {/* Hamburger mobile */}
                     <button onClick={() => setMenuOpen(!menuOpen)}
-                        style={{ display: 'none', background: 'none', border: 'none', color: S.text, fontSize: 24, cursor: 'pointer', padding: 4 }}
+                        aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+                        style={{ display: 'none', background: 'none', border: 'none', color: S.text, cursor: 'pointer', padding: 4 }}
                         className="nav-hamburger">
-                        {menuOpen ? '✕' : '☰'}
+                        <Ico name={menuOpen ? 'close' : 'menu'} size={26} />
                     </button>
                 </div>
 
@@ -83,8 +105,8 @@ export default function Home() {
                             </a>
                         ))}
                         <Link href="/perguntas-frequentes" onClick={() => setMenuOpen(false)}
-                            style={{ padding: '10px 0', fontSize: 16, fontWeight: 700, color: S.gold, textDecoration: 'none', borderBottom: S.border }}>
-                            ❓ Posso recorrer?
+                            style={{ padding: '10px 0', fontSize: 16, fontWeight: 700, color: S.gold, textDecoration: 'none', borderBottom: S.border, display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <Ico name="help" size={17} /> Posso recorrer?
                         </Link>
                         <Link href="/login" onClick={() => setMenuOpen(false)}
                             style={{ padding: '10px 0', fontSize: 16, fontWeight: 700, color: S.muted, textDecoration: 'none', borderBottom: S.border }}>
@@ -107,8 +129,8 @@ export default function Home() {
                 borderBottom: S.border,
             }}>
                 <div style={{ maxWidth: 900, margin: '0 auto', padding: '92px 24px 72px', textAlign: 'center' }}>
-                    <div style={{ display: 'inline-block', padding: '6px 16px', borderRadius: 20, background: 'rgba(201,151,62,.14)', border: '1px solid rgba(201,151,62,.35)', backdropFilter: 'blur(6px)', fontSize: 13, color: S.gold, fontWeight: 700, marginBottom: 26 }}>
-                        🇵🇹 Especializado no Código da Estrada Português
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 16px', borderRadius: 20, background: 'rgba(201,151,62,.14)', border: '1px solid rgba(201,151,62,.35)', backdropFilter: 'blur(6px)', fontSize: 13, color: S.gold, fontWeight: 700, marginBottom: 26 }}>
+                        <Ico name="scale" size={15} /> Especializado no Código da Estrada Português
                     </div>
                     <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.3rem)', fontWeight: 800, lineHeight: 1.13, marginBottom: 20, textShadow: '0 2px 24px rgba(0,0,0,.55)' }}>
                         Conteste a sua coima de trânsito<br />
@@ -170,13 +192,13 @@ export default function Home() {
                 <p style={{ textAlign: 'center', color: S.muted, fontSize: 15, marginBottom: 48, maxWidth: 520, margin: '0 auto 48px' }}>Quatro passos guiados por IA. Não precisa de conhecimentos jurídicos — responde com as suas palavras.</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 2, background: '#1e2540', borderRadius: 14, overflow: 'hidden' }}>
                     {[
-                        { n: '01', icon: '📄', titulo: 'Carregue o auto', desc: 'Fotografe ou faça upload do PDF da notificação. A IA lê o documento e preenche os dados automaticamente.' },
-                        { n: '02', icon: '✏️', titulo: 'Confirme os dados', desc: 'Verifique os dados extraídos e corrija se necessário. Tudo editável antes de avançar.' },
-                        { n: '03', icon: '💬', titulo: 'Responda às perguntas', desc: 'A IA faz perguntas simples sobre o que aconteceu e identifica os vícios formais sozinha — sem jargão jurídico.' },
-                        { n: '04', icon: '⚖️', titulo: 'Transfira a defesa', desc: 'Documento completo fundamentado no CE e RGCO, com guia de submissão incluído. Pronto para a ANSR.' },
+                        { n: '01', icon: 'file' as const, titulo: 'Carregue o auto', desc: 'Fotografe ou faça upload do PDF da notificação. A IA lê o documento e preenche os dados automaticamente.' },
+                        { n: '02', icon: 'edit' as const, titulo: 'Confirme os dados', desc: 'Verifique os dados extraídos e corrija se necessário. Tudo editável antes de avançar.' },
+                        { n: '03', icon: 'message' as const, titulo: 'Responda às perguntas', desc: 'A IA faz perguntas simples sobre o que aconteceu e identifica os vícios formais sozinha — sem jargão jurídico.' },
+                        { n: '04', icon: 'scale' as const, titulo: 'Transfira a defesa', desc: 'Documento completo fundamentado no CE e RGCO, com guia de submissão incluído. Pronto para a ANSR.' },
                     ].map(({ n, icon, titulo, desc }, i) => (
                         <div key={n} className="reveal" style={{ background: S.bg2, padding: '28px 22px', transitionDelay: `${i * 90}ms` }}>
-                            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(201,151,62,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 16 }}>{icon}</div>
+                            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(201,151,62,.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}><Ico name={icon} size={22} color={S.gold} /></div>
                             <p style={{ fontSize: 12, color: S.gold, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '.06em', marginBottom: 8 }}>Passo {n}</p>
                             <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>{titulo}</h3>
                             <p style={{ fontSize: 13, color: S.muted, lineHeight: 1.6, margin: 0 }}>{desc}</p>
@@ -221,7 +243,7 @@ export default function Home() {
                         <div style={{ position: 'relative', background: '#f6f3ea', borderRadius: 10, padding: '30px 28px 26px', boxShadow: '0 30px 70px rgba(0,0,0,.55), 0 4px 18px rgba(0,0,0,.3)', transform: 'rotate(-1.6deg)', color: '#2b2b33' }}>
                             {/* Selo */}
                             <div style={{ position: 'absolute', top: -16, right: -14, width: 84, height: 84, borderRadius: '50%', background: S.gold, color: '#0b0e18', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', transform: 'rotate(9deg)', boxShadow: '0 8px 24px rgba(201,151,62,.45)', textAlign: 'center' as const, lineHeight: 1.15 }}>
-                                <span style={{ fontSize: 15 }}>⚖️</span>
+                                <Ico name="scale" size={17} color="#0b0e18" style={{ marginBottom: 2 }} />
                                 <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.04em' }}>CE · RGCO</span>
                                 <span style={{ fontSize: 7, fontWeight: 700 }}>DL 433/82</span>
                             </div>
@@ -320,7 +342,7 @@ export default function Home() {
 
                     {/* Garantia */}
                     <div style={{ background: 'rgba(74,170,106,.06)', border: '1px solid rgba(74,170,106,.2)', borderRadius: 12, padding: '14px 22px', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 20 }}>🛡️</span>
+                        <Ico name="shield" size={22} color={S.green} />
                         <p style={{ fontSize: 14, color: S.muted, margin: 0 }}>
                             <strong style={{ color: S.text }}>Garantia de devolução:</strong> se a IA não identificar nenhum fundamento de defesa, devolvemos o crédito integralmente.
                         </p>
@@ -398,8 +420,15 @@ export default function Home() {
 
                     {/* Selos de segurança */}
                     <div style={{ display: 'flex', gap: 20, justifyContent: 'center', flexWrap: 'wrap', marginTop: 24 }}>
-                        {['🔒 Pagamento Seguro SSL', '💳 Processado pelo Stripe', '🛡️ Conformidade RGPD', '↩️ Devolução Garantida'].map(s => (
-                            <span key={s} style={{ fontSize: 12, color: '#4a5060' }}>{s}</span>
+                        {[
+                            { icon: 'lock' as const, label: 'Pagamento Seguro SSL' },
+                            { icon: 'card' as const, label: 'Processado pelo Stripe' },
+                            { icon: 'shield' as const, label: 'Conformidade RGPD' },
+                            { icon: 'refund' as const, label: 'Devolução Garantida' },
+                        ].map(s => (
+                            <span key={s.label} style={{ fontSize: 12, color: '#6a7284', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                <Ico name={s.icon} size={14} color="#6a7284" /> {s.label}
+                            </span>
                         ))}
                     </div>
                 </div>
@@ -409,14 +438,14 @@ export default function Home() {
             <section style={{ backgroundImage: 'linear-gradient(180deg, #0b0e18 0%, rgba(11,14,24,.86) 35%, rgba(11,14,24,.86) 70%, #0b0e18 100%), url(/hero-road.jpg)', backgroundSize: 'cover', backgroundPosition: 'center 40%', borderTop: '1px solid rgba(201,151,62,.2)', padding: '80px 24px', textAlign: 'center' }}>
                 {/* Urgência */}
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(224,80,80,.1)', border: '1px solid rgba(224,80,80,.25)', borderRadius: 20, padding: '6px 16px', fontSize: 13, color: S.red, fontWeight: 600, marginBottom: 24 }}>
-                    ⏱️ O prazo de 15 dias úteis está a contar — cada dia perdido é uma oportunidade de defesa
+                    <Ico name="timer" size={15} /> O prazo de 15 dias úteis está a contar — cada dia perdido é uma oportunidade de defesa
                 </div>
                 <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2rem)', fontWeight: 700, marginBottom: 12 }}>Pronto para contestar a sua coima?</h2>
                 <p style={{ color: S.muted, marginBottom: 28, fontSize: 15, maxWidth: 500, margin: '0 auto 28px' }}>Não deixe o prazo passar. Gere a sua defesa em 5 minutos e submeta-a hoje.</p>
                 <Link href="/planos" style={{ padding: '16px 40px', borderRadius: 10, fontSize: 17, fontWeight: 700, background: S.gold, color: '#0b0e18', textDecoration: 'none', display: 'inline-block', marginBottom: 16, boxShadow: '0 6px 28px rgba(201,151,62,.4)' }}>
                     Contestar a minha coima agora
                 </Link>
-                <p style={{ fontSize: 12, color: '#4a5060', margin: 0 }}>🛡️ Devolução garantida se não houver fundamento · A informação disponibilizada não constitui aconselhamento jurídico</p>
+                <p style={{ fontSize: 12, color: '#8892aa', margin: 0, display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}><Ico name="shield" size={13} color="#8892aa" /> Devolução garantida se não houver fundamento · A informação disponibilizada não constitui aconselhamento jurídico</p>
             </section>
 
             {/* ── FOOTER ── */}
