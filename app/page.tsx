@@ -45,7 +45,7 @@ export default function Home() {
     }, []);
 
     return (
-        <div style={{ minHeight: '100vh', background: S.bg, color: S.text, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+        <div className="landing-root" style={{ minHeight: '100vh', background: S.bg, color: S.text, fontFamily: 'var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
 
             {/* ── NAV ── */}
             <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(11,14,24,.96)', backdropFilter: 'blur(12px)', borderBottom: S.border }}>
@@ -447,6 +447,8 @@ export default function Home() {
                 @media (prefers-reduced-motion: reduce) {
                     .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
                 }
+                .landing-root { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+                .landing-root h1, .landing-root h2 { font-family: var(--font-serif), Georgia, "Times New Roman", serif; letter-spacing: -0.015em; }
             `}</style>
         </div>
     );
